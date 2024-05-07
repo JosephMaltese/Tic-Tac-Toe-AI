@@ -57,8 +57,6 @@ def result(board, action):
     """
     Returns the board that results from making move (i, j) on the board.
     """
-    print("ACTION", end= " ")
-    print(action)
     i = action[0]
     j = action[1]
     newBoard = copy.deepcopy(board)
@@ -150,51 +148,6 @@ def utility(board):
     return 0
 
 
-# def minimax(board):
-#     """
-#     Returns the optimal action for the current player on the board.
-#     """
-#     if terminal(board):
-#         return None
-#
-#     if player(board) == 'X':
-#         maxVal = minimaxHelper(board, True)
-#         return maxMove
-#     else:
-#         minVal = minimaxHelper(board, False)
-#         return minMove
-
-
-
-# def minimaxHelper(board, maximizerTurn):
-#     if terminal(board):
-#         return utility(board)
-#     if maximizerTurn == True:
-        # maxVal = -1000000
-        # maxMove = None
-        # possibleActions = actions(board)
-        # print(possibleActions)
-        # for action in possibleActions:
-        #     actionScore = minimaxHelper(result(board,action),False)
-        #
-        #     if max(actionScore,maxVal) != maxVal:
-        #         maxMove = action
-        #     maxVal = max(actionScore,maxVal)
-        #
-        # return maxVal
-    # else:
-    #     minVal = 1000000
-    #     possibleActions = actions(board)
-    #     print(possibleActions)
-    #     for action in possibleActions:
-    #         actionScore = minimaxHelper(result(board, action), True)
-    #
-    #         if min(actionScore,minVal) != minVal:
-    #             minMove = action
-    #         minVal = min(actionScore, minVal)
-    #     return minVal
-
-
 def minimax(board):
     """
     Returns the optimal action for the current player on the board.
@@ -207,21 +160,41 @@ def minimax(board):
     if player(board) == X:
 
         maxVal = -float('inf')
+        count = 0
         for action in possibleActions:
-            actionScore = minimaxHelper(result(board,action), False)
+            if count == 0:
+                firstActionScore = minimaxHelper(result(board,action), False)
+                if firstActionScore > maxVal:
+                    maxVal = firstActionScore
+                    optimalMove = action
+            else:
+                actionScore = minimaxHelper2(result(board,action), False, firstActionScore)
+                if actionScore == None:
+                    continue
+                if actionScore > maxVal:
+                    maxVal = actionScore
+                    optimalMove = action
 
-            if actionScore > maxVal:
-                maxVal = actionScore
-                optimalMove = action
+            count+=1
+
     else:
         minVal = float('inf')
+
+        count = 0
         for action in possibleActions:
-            actionScore = minimaxHelper(result(board, action), True)
-
-            if actionScore < minVal:
-                minVal = actionScore
-                optimalMove = action
-
+            if (count == 0):
+                firstActionScore = minimaxHelper(result(board, action), True)
+                if firstActionScore < minVal:
+                    minVal = firstActionScore
+                    optimalMove = action
+            else:
+                actionScore = minimaxHelper2(result(board, action), True, firstActionScore)
+                if actionScore == None:
+                    continue
+                if actionScore < minVal:
+                    minVal = actionScore
+                    optimalMove = action
+            count += 1
     return optimalMove
 
 
@@ -244,7 +217,6 @@ def minimaxHelper(board, maximizerTurn):
     else:
         minVal = float('inf')
         possibleActions = actions(board)
-        print(possibleActions)
         for action in possibleActions:
             actionScore = minimaxHelper(result(board, action), True)
 
@@ -252,3 +224,30 @@ def minimaxHelper(board, maximizerTurn):
         return minVal
 
 
+def minimaxHelper2(board, maximizerTurn, compVal):
+    if terminal(board):
+        return utility(board)
+
+    if maximizerTurn == True:
+        maxVal = -float('inf')
+        possibleActions = actions(board)
+        for action in possibleActions:
+            actionScore = minimaxHelper(result(board, action), False)
+            if actionScore > compVal:
+                return None
+
+            maxVal = max(actionScore, maxVal)
+
+        return maxVal
+
+    else:
+        minVal = float('inf')
+        possibleActions = actions(board)
+        for action in possibleActions:
+            actionScore = minimaxHelper(result(board, action), True)
+
+            if actionScore < compVal:
+                return None
+
+            minVal = min(actionScore, minVal)
+        return minVal
