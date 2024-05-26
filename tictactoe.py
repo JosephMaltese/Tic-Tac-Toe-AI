@@ -62,10 +62,13 @@ def result(board, action):
     newBoard = copy.deepcopy(board)
     currentPlayer = player(board)
 
+    if i < 0 or i > 2 or j < 0 or j > 2:
+        raise ValueError
+
     if (board[i][j] == None):
         newBoard[i][j] = currentPlayer
     else:
-        raise Exception
+        raise ValueError
 
     return newBoard
 
@@ -77,42 +80,20 @@ def winner(board):
 
     # Check for horizontal win
     for i in range(3):
-        element = board[i][0]
-        count = 1
-        for j in range(1,3):
-            if board[i][j] == element:
-                count += 1
-        if count == 3:
-            return element
+        if board[i][0] == board[i][1] == board[i][2] and board[i][0] is not None:
+            return board[i][0]
 
     # Check for vertical win
     for j in range(3):
-        element = board[0][j]
-        count = 1
-        for i in range(1,3):
-            if board[i][j] == element:
-                count += 1
-        if count == 3:
-            return element
+        if board[0][j] == board[1][j] == board[2][j] and board[0][j] is not None:
+            return board[0][j]
 
     # Check for diagonal win
-    element = board[0][0]
-    count = 1
+    if board[0][0] == board[1][1] == board[2][2] and board[0][0] is not None:
+        return board[0][0]
 
-    for i in range(1,3):
-        if board[i][i] == element:
-            count += 1
-    if count == 3:
-        return element
-
-    element = board[2][0]
-    count = 1
-
-    for i in range(1,-1,-1):
-        if board[i][2-i] == element:
-            count += 1
-    if count == 3:
-        return element
+    if board[2][0] == board[1][1] == board[0][2] and board[2][0] is not None:
+        return board[2][0]
 
     # If no winner, return None
     return None
